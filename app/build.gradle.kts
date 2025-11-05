@@ -104,4 +104,11 @@ dependencies {
     implementation("androidx.camera:camera-extensions:$cameraVersion")
 
     implementation("com.google.zxing:core:3.5.3")
+
+    // Bouncy Castle for post-quantum cryptography (ML-KEM/Kyber)
+    implementation("org.bouncycastle:bcprov-jdk18on:1.79")
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.79")
+
+    // Security library for encrypted shared preferences
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 }

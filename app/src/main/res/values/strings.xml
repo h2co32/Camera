@@ -198,4 +198,36 @@
 
     <string name="wait_for_focus_lock">Wait for Focus Lock</string>
     <string name="invalid_photo_quality_value">Invalid value set for photo quality</string>
+
+    <!-- Post-Quantum Encryption Strings -->
+    <string name="pqc_encryption_settings">Post-Quantum Encryption</string>
+    <string name="enable_pqc_encryption">Enable Post-Quantum Encryption</string>
+    <string name="pqc_encryption_description">Encrypt photos using ML-KEM-768 (post-quantum secure). Encrypted photos cannot be viewed on the device and require the decryption utility on a computer.</string>
+    <string name="key_management">Key Management</string>
+    <string name="no_key_configured">No encryption key configured</string>
+    <string name="encryption_ready">Encryption ready</string>
+    <string name="generate_new_keypair">Generate New Keypair</string>
+    <string name="import_public_key">Import Public Key</string>
+    <string name="export_private_key">Export Private Key</string>
+    <string name="help_title">Help</string>
+    <string name="pqc_help_text">1. Generate a new keypair or import an existing public key\n2. Enable encryption to start encrypting photos\n3. Export the private key to your computer\n4. Use the decryption utility to decrypt photos\n\nWarning: Without the private key, encrypted photos cannot be recovered!</string>
+    <string name="generate_key_first">Please generate or import a key first</string>
+    <string name="encryption_enabled_message">Photos will now be encrypted. Preview disabled.</string>
+    <string name="generate_keypair_title">Generate New Keypair?</string>
+    <string name="generate_keypair_message">This will create a new ML-KEM-768 keypair for encryption. Make sure to export and save the private key safely!</string>
+    <string name="generate">Generate</string>
+    <string name="keypair_generated_title">Keypair Generated</string>
+    <string name="keypair_generated_message">A new encryption keypair has been generated. You should export the private key now to ensure you can decrypt your photos later.</string>
+    <string name="export_now">Export Now</string>
+    <string name="later">Later</string>
+    <string name="keypair_generation_failed">Failed to generate keypair: %s</string>
+    <string name="public_key_imported_successfully">Public key imported successfully</string>
+    <string name="public_key_import_failed">Failed to import public key</string>
+    <string name="public_key_import_failed_error">Failed to import public key: %s</string>
+    <string name="no_private_key_to_export">No private key available for export</string>
+    <string name="private_key_exported_title">Private Key Exported</string>
+    <string name="private_key_exported_message">Private key saved to:\n%s\n\nKeep this file safe! You need it to decrypt your photos.</string>
+    <string name="private_key_export_failed">Failed to export private key</string>
+    <string name="private_key_export_failed_error">Failed to export private key: %s</string>
+    <string name="storage_permission_required">Storage permission is required to export the private key</string>
 </resources>

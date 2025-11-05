@@ -119,6 +119,8 @@ class CamConfig(private val mActivity: MainActivity) {
 
             const val WAIT_FOR_FOCUS_LOCK = "wait_for_focus_lock"
 
+            const val PQC_ENCRYPTION_ENABLED = "pqc_encryption_enabled"
+
             // const val IMAGE_FILE_FORMAT = "image_quality"
             // const val VIDEO_FILE_FORMAT = "video_quality"
         }
@@ -165,6 +167,8 @@ class CamConfig(private val mActivity: MainActivity) {
             const val SELECT_HIGHEST_RESOLUTION = false
 
             const val WAIT_FOR_FOCUS_LOCK = false
+
+            const val PQC_ENCRYPTION_ENABLED = false
 
             // const val IMAGE_FILE_FORMAT = ""
             // const val VIDEO_FILE_FORMAT = ""
@@ -560,6 +564,22 @@ class CamConfig(private val mActivity: MainActivity) {
             val editor = commonPref.edit()
             editor.putBoolean(
                 SettingValues.Key.GYROSCOPE_SUGGESTIONS,
+                value
+            )
+            editor.apply()
+        }
+
+    var pqcEncryptionEnabled: Boolean
+        get() {
+            return commonPref.getBoolean(
+                SettingValues.Key.PQC_ENCRYPTION_ENABLED,
+                SettingValues.Default.PQC_ENCRYPTION_ENABLED
+            )
+        }
+        set(value) {
+            val editor = commonPref.edit()
+            editor.putBoolean(
+                SettingValues.Key.PQC_ENCRYPTION_ENABLED,
                 value
             )
             editor.apply()

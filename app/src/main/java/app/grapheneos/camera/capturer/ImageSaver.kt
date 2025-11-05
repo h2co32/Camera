@@ -26,6 +26,8 @@ import app.grapheneos.camera.ITEM_TYPE_IMAGE
 import app.grapheneos.camera.capturer.ImageSaverException.Place
 import app.grapheneos.camera.clearExif
 import app.grapheneos.camera.fixExif
+import app.grapheneos.camera.crypto.PQCryptoManager
+import app.grapheneos.camera.crypto.PQKeyManager
 import app.grapheneos.camera.util.ImageResizer
 import app.grapheneos.camera.util.executeIfAlive
 import app.grapheneos.camera.util.getTreeDocumentUri
@@ -68,6 +70,7 @@ class ImageSaver(
     val removeExifAfterCapture: Boolean,
     @Px val targetThumbnailWidth: Int,
     @Px val targetThumbnailHeight: Int,
+    val encryptionEnabled: Boolean = false,
 ) : ImageCapture.OnImageCapturedCallback()
 {
     val captureTime = Date()
@@ -75,6 +78,7 @@ class ImageSaver(
     val mainThreadExecutor = appContext.mainExecutor
 
     private var isCancelled = false
+    private var isEncrypted = false  // Track if this image was encrypted
 
     fun cancelCaptureRequest() {
         isCancelled = true
@@ -131,7 +135,10 @@ class ImageSaver(
             return
         }
 
-        imageCapturer.mActivity.thumbnailLoaderExecutor.executeIfAlive(this::generateThumbnail)
+        // Skip thumbnail generation for encrypted photos (can't preview encrypted data)
+        if (!isEncrypted) {
+            imageCapturer.mActivity.thumbnailLoaderExecutor.executeIfAlive(this::generateThumbnail)
+        }
     }
 
     private var cropRect: Rect? = null
@@ -158,6 +165,29 @@ class ImageSaver(
         }
 
         processedJpegBytes = processExif(uncroppedJpegBytes)
+
+        // Encrypt photo if post-quantum encryption is enabled
+        if (encryptionEnabled) {
+            val keyManager = PQKeyManager(appContext)
+            val publicKey = keyManager.getPublicKey()
+
+            if (publicKey != null) {
+                val encryptedBytes = PQCryptoManager.encryptPhoto(processedJpegBytes, publicKey)
+                if (encryptedBytes != null) {
+                    processedJpegBytes = encryptedBytes
+                    isEncrypted = true
+                    Log.d(TAG, "Photo encrypted with ML-KEM-768")
+                } else {
+                    Log.e(TAG, "Encryption failed, saving unencrypted")
+                    throw ImageSaverException(Place.IMAGE_EXTRACTION,
+                        Exception("Post-quantum encryption failed"))
+                }
+            } else {
+                Log.e(TAG, "No public key available for encryption")
+                throw ImageSaverException(Place.IMAGE_EXTRACTION,
+                    Exception("No encryption key available"))
+            }
+        }
 
         val startOfWriting = timestamp()
 
@@ -291,10 +321,20 @@ class ImageSaver(
         SimpleDateFormat("yyyyMMdd_HHmmss_SSS", Locale.US).format(captureTime)
 
     private fun fileName(): String {
-        return IMAGE_NAME_PREFIX + dateString() + imageFileFormat
+        val extension = if (encryptionEnabled) {
+            PQCryptoManager.getEncryptedFileExtension()
+        } else {
+            imageFileFormat
+        }
+        return IMAGE_NAME_PREFIX + dateString() + extension
     }
 
-    private fun mimeType() = MimeTypeMap.getSingleton().getMimeTypeFromExtension(imageFileFormat) ?: "image/*"
+    private fun mimeType(): String {
+        if (encryptionEnabled) {
+            return "application/octet-stream"  // Encrypted files are binary
+        }
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(imageFileFormat) ?: "image/*"
+    }
 
     @Throws(Exception::class)
     fun obtainOutputUri(): Uri? {
