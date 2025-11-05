@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            app:title="@string/pqc_encryption_settings"
+            app:navigationIcon="@drawable/back" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Enable Encryption Toggle -->
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/encryption_enabled_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/enable_pqc_encryption"
+                android:padding="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pqc_encryption_description"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_marginBottom="24dp"
+                android:paddingHorizontal="16dp" />
+
+            <!-- Key Management Section -->
+            <TextView
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/key_management"
+                android:layout_marginBottom="8dp"
+                android:paddingHorizontal="16dp" />
+
+            <!-- Encryption Status -->
+            <TextView
+                android:id="@+id/encryption_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/no_key_configured"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_marginBottom="16dp"
+                android:paddingHorizontal="16dp" />
+
+            <!-- Generate Keypair Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/generate_keypair_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/generate_new_keypair"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp"
+                app:icon="@drawable/add" />
+
+            <!-- Import Public Key Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/import_public_key_button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/import_public_key"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Export Private Key Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/export_private_key_button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/export_private_key"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="24dp"
+                android:enabled="false" />
+
+            <!-- Help Section -->
+            <TextView
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/help_title"
+                android:layout_marginBottom="8dp"
+                android:paddingHorizontal="16dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pqc_help_text"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:paddingHorizontal="16dp" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
