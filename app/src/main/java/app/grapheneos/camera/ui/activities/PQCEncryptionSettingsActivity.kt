@@ -28,8 +28,6 @@ class PQCEncryptionSettingsActivity : AppCompatActivity() {
     private lateinit var keyManager: PQKeyManager
     private lateinit var camConfig: CamConfig
 
-    private var pendingPrivateKeyExport: String? = null
-
     private val PERMISSION_REQUEST_CODE = 1001
 
     // File picker for importing public key
@@ -57,6 +55,7 @@ class PQCEncryptionSettingsActivity : AppCompatActivity() {
         setupToolbar()
         setupViews()
         updateStatus()
+        checkForPendingPrivateKey()
     }
 
     private fun setupToolbar() {
@@ -119,7 +118,7 @@ class PQCEncryptionSettingsActivity : AppCompatActivity() {
         }
 
         // Enable export button only if there's a key to export (after generation)
-        binding.exportPrivateKeyButton.isEnabled = pendingPrivateKeyExport != null
+        binding.exportPrivateKeyButton.isEnabled = keyManager.hasPendingPrivateKey()
     }
 
     private fun generateNewKeypair() {
@@ -129,7 +128,9 @@ class PQCEncryptionSettingsActivity : AppCompatActivity() {
             .setPositiveButton(R.string.generate) { _, _ ->
                 try {
                     val (publicKeyPem, privateKeyPem) = keyManager.generateAndStoreKeyPair()
-                    pendingPrivateKeyExport = privateKeyPem
+
+                    // Store private key securely to survive configuration changes
+                    keyManager.storePendingPrivateKey(privateKeyPem)
 
                     updateStatus()
 
@@ -157,7 +158,8 @@ class PQCEncryptionSettingsActivity : AppCompatActivity() {
             val pemContent = reader.use { it.readText() }
 
             if (keyManager.importPublicKey(pemContent)) {
-                pendingPrivateKeyExport = null // Clear pending export since we're importing
+                // Clear pending private key since we're importing (not generating)
+                keyManager.clearPendingPrivateKey()
                 updateStatus()
                 showMessage(getString(R.string.public_key_imported_successfully))
             } else {
@@ -169,7 +171,7 @@ class PQCEncryptionSettingsActivity : AppCompatActivity() {
     }
 
     private fun exportPrivateKey() {
-        val privateKeyPem = pendingPrivateKeyExport
+        val privateKeyPem = keyManager.getPendingPrivateKey()
         if (privateKeyPem == null) {
             showMessage(getString(R.string.no_private_key_to_export))
             return
@@ -201,8 +203,8 @@ class PQCEncryptionSettingsActivity : AppCompatActivity() {
                     .setPositiveButton(android.R.string.ok, null)
                     .show()
 
-                // Clear pending export after successful save
-                pendingPrivateKeyExport = null
+                // Clear pending private key after successful export
+                keyManager.clearPendingPrivateKey()
                 updateStatus()
             } else {
                 showMessage(getString(R.string.private_key_export_failed))
@@ -220,10 +222,28 @@ class PQCEncryptionSettingsActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                pendingPrivateKeyExport?.let { doExportPrivateKey(it) }
+                keyManager.getPendingPrivateKey()?.let { doExportPrivateKey(it) }
             } else {
                 showMessage(getString(R.string.storage_permission_required))
             }
+        }
+    }
+
+    /**
+     * Check for pending private key that hasn't been exported yet.
+     * Shows a warning dialog if found, prompting immediate export.
+     */
+    private fun checkForPendingPrivateKey() {
+        if (keyManager.hasPendingPrivateKey()) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.pending_private_key_title)
+                .setMessage(R.string.pending_private_key_message)
+                .setPositiveButton(R.string.export_now) { _, _ ->
+                    exportPrivateKey()
+                }
+                .setNegativeButton(R.string.later, null)
+                .setCancelable(false)
+                .show()
         }
     }
 
